@@ -41,6 +41,9 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         if(key ==  GLFW_KEY_C) {
             printf("%d\n", world->count);
         }
+        if(key ==  GLFW_KEY_W) {
+            world->exf *= -1.0f;
+        }
     }
 }
 
@@ -48,6 +51,9 @@ void initialize() {
     initBases();
     
     world = new World(width * 2 * u, height * 2 * u, 2048);
+    
+    world->exf.x = 0.0f;
+    world->exf.y = -90.0f;
 }
 
 void free() {
@@ -109,11 +115,11 @@ int main(int argc, const char * argv[]) {
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     
-    
     int w = 300;
     int h = 300;
     
-    world->addRect((w * 2.0f - width) * u * 2.0f, (h * 2.0f - height) * u * -2.0f, w, h, 0.75f);
+    //world->addRect((w * 2.0f - width) * u * 2.0f, (h * 2.0f - height) * u * -2.0f, w, h, 0.75f);
+    world->addCircle(0.0f, 0.0f, 120.0f, 0.5f);
     
     do {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

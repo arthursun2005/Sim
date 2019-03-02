@@ -1,19 +1,16 @@
 #version 410 core
 
-vec4 get(in sampler2D T, ivec2 p) {
-    vec4 n = texelFetch(T, p, 0);
-    vec2 x = texelFetch(T, p + ivec2(1, 0), 0).xz;
-    vec2 y = texelFetch(T, p + ivec2(0, 1), 0).yw;
+vec4 get(in sampler2D T, vec2 p, vec2 s) {
+    vec2 g = 1.0 + s;
+    p = (p + s)/(2.0 * g);
+    vec4 n = texture(T, p);
+    vec2 x = texture(T, p + vec2(1.0/g.x, 0.0)).xz;
+    vec2 y = texture(T, p + vec2(0.0, 1.0/g.y)).yw;
     return (n + vec4(x.x, y.x, x.y, y.y)) * 0.5;
 }
 
-vec4 get(in sampler2D T, vec2 p) {
-    vec2 k = floor(p - 0.5) + 0.5;
-    vec2 d = abs(p - k);
-    ivec2 q = ivec2(k);
-    vec4 n00 = get(T, q + ivec2(0, 0)) * (1.0 - d.x) * (1.0 - d.y);
-    vec4 n01 = get(T, q + ivec2(0, 1)) * (1.0 - d.x) * (d.y);
-    vec4 n10 = get(T, q + ivec2(1, 0)) * (d.x) * (1.0 - d.y);
-    vec4 n11 = get(T, q + ivec2(1, 1)) * (d.x) * (d.y);
-    return n00 + n01 + n10 + n11;
+vec2 rand(float seed, vec2 coord) {
+    float x = fract(cos(distance(vec2(seed * 12.22334 + 2.2123311, 9.12524 + seed * 0.1631), coord.yx)) * seed);
+    float y = fract(sin(distance(vec2(121.451236 + seed * 0.12631, seed * 141.223453 + 8.9162422), coord.xy)) * seed);
+    return vec2(x, y);
 }

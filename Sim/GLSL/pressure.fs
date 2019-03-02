@@ -11,7 +11,7 @@ void main() {
     float m = texture(M, coord).x;
     
     if(m == 0.0) {
-        U = 0.0;
+        //U = 0.0;
         discard;
     }
     

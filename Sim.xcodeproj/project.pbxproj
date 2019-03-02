@@ -31,6 +31,7 @@
 		8E2090AD22288A9D0090D875 /* show.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = show.fs; sourceTree = "<group>"; };
 		8E2090AE2228FB890090D875 /* gridForce.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = gridForce.fs; sourceTree = "<group>"; };
 		8E2090AF2229FF040090D875 /* copy.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = copy.fs; sourceTree = "<group>"; };
+		8E2090B0222A4F930090D875 /* circle.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = circle.fs; sourceTree = "<group>"; };
 		8E219B192223D3A200DA7D8A /* Sim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Sim; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E219B1C2223D3A200DA7D8A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		8E219B242223D3C200DA7D8A /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -127,6 +128,7 @@
 				8E219B35222524A400DA7D8A /* grid.fs */,
 				8EBA3DFA2225EDA20044CD84 /* extend.fs */,
 				8E4C8947222538170073A866 /* rect.fs */,
+				8E2090B0222A4F930090D875 /* circle.fs */,
 				8E219B3922252E3500DA7D8A /* divergence.fs */,
 				8E219B3C2225331600DA7D8A /* pressure.fs */,
 				8E219B3B222530A800DA7D8A /* weightVel.fs */,

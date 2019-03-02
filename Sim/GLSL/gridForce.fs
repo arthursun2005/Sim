@@ -19,20 +19,22 @@ void main() {
     }
      */
     
-    vec2 pos = gl_FragCoord.xy - vec2(0.5, 0.5);
+    vec2 pos = gl_FragCoord.xy;
     
-    if(pos.x < 2.0) {
-        vel0.x = 0.0;
+    float s = 0.0;
+    
+    if(pos.x < 1.0) {
+        vel0.x = exf.x * s;
     }
-    if(pos.y < 2.0) {
-        vel0.y = 0.0;
+    if(pos.y < 1.0) {
+        vel0.y = exf.y * s;
     }
     
-    if(pos.x > size.x - 2.0) {
-        vel0.x = 0.0;
+    if(pos.x > size.x - 1.0) {
+        vel0.x = -exf.x * s;
     }
-    if(pos.y > size.y - 2.0) {
-        vel0.y = 0.0;
+    if(pos.y > size.y - 1.0) {
+        vel0.y = -exf.y * s;
     }
     
     

@@ -207,6 +207,21 @@ void World::addRect(float x, float y, int w, int h, float s) {
     count += i;
 }
 
+void World::addCircle(float x, float y, float r, float s) {
+    int i = (int)(M_PI * r * r / (s * s));
+    
+    assert(count + i <= capacity);
+    
+    sd[e_circle]->bind();
+    sd[e_circle]->uniform1f("radius", r);
+    sd[e_circle]->uniform2f("pos", x, y);
+    
+    dtex[e_positions]->i(1).bind();
+    blit(dtex[e_positions]->i(1), VAO[0], count, i, roots);
+    
+    count += i;
+}
+
 void World::copyToTemp() {
     sd[e_copy]->bind();
     sd[e_copy]->uniform1i("T", dtex[e_grid]->i(1).id);

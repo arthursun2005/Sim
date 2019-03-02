@@ -9,6 +9,11 @@ uniform vec2 invGrid;
 void main() {
     vec2 coord = gl_FragCoord.xy * invGrid;
     vec2 coord2 = gl_FragCoord.xy * invSize;
+    float w = texture(W, coord2).x;
+    
+    if(w == 0.0)
+        discard;
+    
     vec4 vel0 = texture(V, coord);
     float n = texture(U, coord2).x;
     float x = texture(U, coord2 - vec2(invSize.x, 0.0)).x;

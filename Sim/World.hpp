@@ -46,6 +46,7 @@ protected:
         e_show,
         e_gridForce,
         e_copy,
+        e_circle,
         sd_end
     };
     
@@ -60,9 +61,8 @@ protected:
     
     glm::vec2 simSize;
     glm::vec2 gridSize;
-    glm::vec2 exf;
     
-    int pressure_iterations = 15;
+    int pressure_iterations = 10;
     
     int root;
     glm::vec2 roots;
@@ -71,6 +71,7 @@ public:
     
     int count;
     int capacity;
+    glm::vec2 exf;
     
     inline void blit(GLuint target, GLuint vao, int start, int count, const glm::ivec2& _size) {
         glBindFramebuffer(GL_FRAMEBUFFER, target);
@@ -87,7 +88,7 @@ public:
     
 public:
     
-    World(int x, int y, int r) : simSize(x, y), gridSize(x + 1.0f, y + 1.0f), count(0), root(r), capacity(r * r), exf(0.0f, -200.0f), roots(r, r)
+    World(int x, int y, int r) : simSize(x, y), gridSize(x + 1.0f, y + 1.0f), count(0), root(r), capacity(r * r), exf(0.0f, 0.0f), roots(r, r)
     {
         dtex[e_positions] = new DoubleTexture(GL_NEAREST);
         dtex[e_positions]->image(GL_RG32F, GL_RG, root, root, GL_FLOAT, 0);
@@ -126,6 +127,7 @@ public:
         sd[e_show] = new Shader("GLSL/pass.vs", "GLSL/show.fs", "GLSL/shared.glsl");
         sd[e_gridForce] = new Shader("GLSL/pass.vs", "GLSL/gridForce.fs", "GLSL/shared.glsl");
         sd[e_copy] = new Shader("GLSL/pass.vs", "GLSL/copy.fs", "GLSL/shared.glsl");
+        sd[e_circle] = new Shader("GLSL/point.vs", "GLSL/circle.fs", "GLSL/shared.glsl");
         
         for(int i = 0; i < dtex_end; ++i) {
             dtex[i]->clear();
@@ -226,7 +228,7 @@ public:
     
     void advect_particles(float dt);
     
-    void addCircle();
+    void addCircle(float x, float y, float r, float s);
     
     void addRect(float x, float y, int w, int h, float s);
     
