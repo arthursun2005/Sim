@@ -25,9 +25,9 @@ World* world;
 
 void addFromMouse() {
     float k = 2.0f * u;
-    int w = 60;
-    int h = 60;
-    world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, w, h, 0.61f);
+    int w = 50;
+    int h = 50;
+    world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, w, h, 0.75f);
 }
 
 void mouseCallback(GLFWwindow* window, int button, int action, int mods)
@@ -109,8 +109,16 @@ int main(int argc, const char * argv[]) {
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     
+    
+    int w = 300;
+    int h = 300;
+    
+    world->addRect((w * 2.0f - width) * u * 2.0f, (h * 2.0f - height) * u * -2.0f, w, h, 0.75f);
+    
     do {
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        
         
         glfwGetCursorPos(window, &mouseX, &mouseY);
         

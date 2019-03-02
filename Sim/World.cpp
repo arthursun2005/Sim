@@ -14,7 +14,13 @@ void World::solve_once(float dt) {
     
     extend();
     
+    
+    copyToTemp();
+    
+    
     apply_forces_bound(dt);
+    
+    
     
     // weighting each cell, 0 means air, >0 means liquid
     weight();
@@ -27,8 +33,6 @@ void World::solve_once(float dt) {
     
     // solving the grid
     solveGrid();
-    
-    //enforceBoundry();
     
     transfer();
     
@@ -129,6 +133,7 @@ void World::transfer() {
     sd[e_particle]->bind();
     sd[e_particle]->uniform2f("invSize", 1.0f/roots);
     sd[e_particle]->uniform2f("size", simSize);
+    sd[e_particle]->uniform1i("T", dtex[e_temp]->i(1).id);
     sd[e_particle]->uniform1i("P", dtex[e_positions]->i(1).id);
     sd[e_particle]->uniform1i("G", dtex[e_grid]->i(1).id);
     sd[e_particle]->uniform1i("V", dtex[e_velocities]->i(1).id);
@@ -139,26 +144,22 @@ void World::transfer() {
     dtex[e_velocities]->swap();
 }
 
-/*
- sd[e_force]->bind();
- sd[e_force]->uniform2f("invSize", 1.0f/roots);
- sd[e_force]->uniform1f("dt", dt);
- sd[e_force]->uniform2f("exf", exf);
- sd[e_force]->uniform2f("bound", simSize);
- sd[e_force]->uniform1i("V", dtex[e_velocities]->i(1).id);
- sd[e_force]->uniform1i("P", dtex[e_positions]->i(1).id);
- 
- dtex[e_velocities]->i(0).bind();
- blit(dtex[e_velocities]->i(0), VAO[0], 0, count, roots);
- 
- dtex[e_velocities]->swap();
- */
+void World::enforceBoundary() {
+    sd[e_boundry]->bind();
+    sd[e_boundry]->uniform2f("size", gridSize);
+    sd[e_boundry]->uniform1i("V", dtex[e_grid]->i(1).id);
+    
+    dtex[e_grid]->i(0).bind();
+    ::blit(dtex[e_grid]->i(0).target->fbo, 0, 0, gridSize.x, gridSize.y);
+    
+    dtex[e_grid]->swap();
+}
 
 void World::apply_forces_bound(float dt) {
     sd[e_gridForce]->bind();
     sd[e_gridForce]->uniform1f("dt", dt);
     sd[e_gridForce]->uniform2f("exf", exf);
-    sd[e_gridForce]->uniform2f("size", simSize);
+    sd[e_gridForce]->uniform2f("size", gridSize);
     sd[e_gridForce]->uniform1i("V", dtex[e_grid]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
@@ -206,7 +207,13 @@ void World::addRect(float x, float y, int w, int h, float s) {
     count += i;
 }
 
-
+void World::copyToTemp() {
+    sd[e_copy]->bind();
+    sd[e_copy]->uniform1i("T", dtex[e_grid]->i(1).id);
+    
+    dtex[e_temp]->i(1).bind();
+    ::blit(dtex[e_temp]->i(1).target->fbo, 0, 0, gridSize.x, gridSize.y);
+}
 
 
 void World::render(GLuint target, int x, int y, int w, int h) {
@@ -216,7 +223,7 @@ void World::render(GLuint target, int x, int y, int w, int h) {
     sd[e_draw]->uniform2f("scl", 1.0f/simSize);
     sd[e_draw]->uniform1f("size", 2.0f);
     
-    glEnable(GL_BLEND);
+    //glEnable(GL_BLEND);
     
     glBindFramebuffer(GL_FRAMEBUFFER, target);
     glBindVertexArray(VAO[0]);
@@ -225,7 +232,7 @@ void World::render(GLuint target, int x, int y, int w, int h) {
     glBindVertexArray(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     
-    glDisable(GL_BLEND);
+    //glDisable(GL_BLEND);
      
     
     /*

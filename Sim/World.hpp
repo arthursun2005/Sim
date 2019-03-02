@@ -21,6 +21,7 @@ protected:
         e_velocities = 0,
         e_positions,
         e_grid,
+        e_temp,
         e_weights,
         e_pressures,
         e_divergence,
@@ -44,6 +45,7 @@ protected:
         e_boundry,
         e_show,
         e_gridForce,
+        e_copy,
         sd_end
     };
     
@@ -60,7 +62,7 @@ protected:
     glm::vec2 gridSize;
     glm::vec2 exf;
     
-    int pressure_iterations = 5;
+    int pressure_iterations = 15;
     
     int root;
     glm::vec2 roots;
@@ -96,6 +98,9 @@ public:
         dtex[e_grid] = new DoubleTexture(GL_LINEAR);
         dtex[e_grid]->image(GL_RGBA32F, GL_RGBA, x + 1, y + 1, GL_FLOAT, 0);
         
+        dtex[e_temp] = new DoubleTexture(GL_LINEAR);
+        dtex[e_temp]->image(GL_RGBA32F, GL_RGBA, x + 1, y + 1, GL_FLOAT, 0);
+        
         dtex[e_weights] = new DoubleTexture(GL_LINEAR);
         dtex[e_weights]->image(GL_R32F, GL_RED, x , y , GL_FLOAT, 0);
         
@@ -120,6 +125,7 @@ public:
         sd[e_boundry] = new Shader("GLSL/pass.vs", "GLSL/boundry.fs", "GLSL/shared.glsl");
         sd[e_show] = new Shader("GLSL/pass.vs", "GLSL/show.fs", "GLSL/shared.glsl");
         sd[e_gridForce] = new Shader("GLSL/pass.vs", "GLSL/gridForce.fs", "GLSL/shared.glsl");
+        sd[e_copy] = new Shader("GLSL/pass.vs", "GLSL/copy.fs", "GLSL/shared.glsl");
         
         for(int i = 0; i < dtex_end; ++i) {
             dtex[i]->clear();
@@ -208,9 +214,13 @@ public:
     
     void apply_forces_bound(float dt);
     
+    void enforceBoundary();
+    
     void transfer();
     
     void extend();
+    
+    void copyToTemp();
         
     
     

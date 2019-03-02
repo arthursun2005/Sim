@@ -11,7 +11,7 @@ void main() {
     float m = texture(M, coord).x;
     
     if(m == 0.0) {
-        //U = 0.0;
+        U = 0.0;
         discard;
     }
     
@@ -20,10 +20,10 @@ void main() {
     float n = texture(M, coord + vec2(0.0, invSize.y)).x;
     float s = texture(M, coord - vec2(0.0, invSize.y)).x;
     
-    w = min(ceil(w), 1.0);
-    e = min(ceil(e), 1.0);
-    n = min(ceil(n), 1.0);
-    s = min(ceil(s), 1.0);
+    w = min(w, 1.0);
+    e = min(e, 1.0);
+    n = min(n, 1.0);
+    s = min(s, 1.0);
     
     
     float E = texture(P, coord + vec2(invSize.x, 0.0)).x * e;

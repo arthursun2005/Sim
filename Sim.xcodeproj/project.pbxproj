@@ -30,6 +30,7 @@
 /* Begin PBXFileReference section */
 		8E2090AD22288A9D0090D875 /* show.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = show.fs; sourceTree = "<group>"; };
 		8E2090AE2228FB890090D875 /* gridForce.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = gridForce.fs; sourceTree = "<group>"; };
+		8E2090AF2229FF040090D875 /* copy.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = copy.fs; sourceTree = "<group>"; };
 		8E219B192223D3A200DA7D8A /* Sim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Sim; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E219B1C2223D3A200DA7D8A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		8E219B242223D3C200DA7D8A /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -117,6 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				8E219B3622252DE600DA7D8A /* pass.vs */,
+				8E2090AF2229FF040090D875 /* copy.fs */,
 				8E219B302223DD6C00DA7D8A /* texture.vs */,
 				8E4C89482225397A0073A866 /* point.vs */,
 				8E219B3A22252FB200DA7D8A /* weight.fs */,
