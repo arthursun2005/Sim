@@ -14,13 +14,9 @@ void World::solve_once(float dt) {
     
     extend();
     
-    
     copyToTemp();
     
-    
     apply_forces_bound(dt);
-    
-    
     
     // weighting each cell, 0 means air, >0 means liquid
     weight();
@@ -40,7 +36,7 @@ void World::solve_once(float dt) {
 }
 
 void World::toGrid() {
-    dtex[e_grid]->i(1).clear();
+    dtex[e_grid]->i(1).clear(target);
     
     sd[e_partToGrid]->bind();
     sd[e_partToGrid]->uniform1i("P", dtex[e_positions]->i(1).id);
@@ -49,8 +45,10 @@ void World::toGrid() {
     
     dtex[e_grid]->i(1).bind();
     
+    target->bind(dtex[e_grid]->i(1), GL_FRAMEBUFFER);
+    
     glEnable(GL_BLEND);
-    blit(dtex[e_grid]->i(1), VAO[1], 0, count * 2, gridSize);
+    blit(VAO[1], 0, count * 2, gridSize);
     glDisable(GL_BLEND);
     
     
@@ -59,7 +57,8 @@ void World::toGrid() {
     sd[e_wvel]->uniform1i("V", dtex[e_grid]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    ::blit(dtex[e_grid]->i(0).target->fbo, 0, 0, gridSize.x, gridSize.y);
+    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
+    blit(gridSize);
     
     dtex[e_grid]->swap();
 }
@@ -70,13 +69,14 @@ void World::extend() {
     sd[e_extend]->uniform1i("V", dtex[e_grid]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    ::blit(dtex[e_grid]->i(0).target->fbo, 0, 0, gridSize.x, gridSize.y);
+    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
+    blit(gridSize);
     
     dtex[e_grid]->swap();
 }
 
 void World::weight() {
-    dtex[e_weights]->i(1).clear();
+    dtex[e_weights]->i(1).clear(target);
     
     sd[e_weight]->bind();
     sd[e_weight]->uniform1i("T", dtex[e_positions]->i(1).id);
@@ -84,8 +84,9 @@ void World::weight() {
     sd[e_weight]->uniform1f("size", 1.0f);
     
     dtex[e_weights]->i(1).bind();
+    target->bind(dtex[e_weights]->i(1), GL_FRAMEBUFFER);
     glEnable(GL_BLEND);
-    blit(dtex[e_weights]->i(1), VAO[0], 0, count, simSize);
+    blit(VAO[0], 0, count, simSize);
     glDisable(GL_BLEND);
 }
 
@@ -96,7 +97,8 @@ void World::calDivergence() {
     sd[e_div]->uniform1i("M", dtex[e_weights]->i(1).id);
     
     dtex[e_divergence]->i(1).bind();
-    ::blit(dtex[e_divergence]->i(1).target->fbo, 0, 0, simSize.x, simSize.y);
+    target->bind(dtex[e_divergence]->i(1), GL_FRAMEBUFFER);
+    blit(simSize);
 }
 
 void World::solvePressure() {
@@ -109,7 +111,8 @@ void World::solvePressure() {
         sd[e_pre]->uniform1i("P", dtex[e_pressures]->i(1).id);
         
         dtex[e_pressures]->i(0).bind();
-        ::blit(dtex[e_pressures]->i(0).target->fbo, 0, 0, simSize.x, simSize.y);
+        target->bind(dtex[e_pressures]->i(0), GL_FRAMEBUFFER);
+        blit(simSize);
         
         dtex[e_pressures]->swap();
     }
@@ -124,7 +127,8 @@ void World::solveGrid() {
     sd[e_subtract]->uniform1i("W", dtex[e_weights]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    ::blit(dtex[e_grid]->i(0).target->fbo, 0, 0, gridSize.x, gridSize.y);
+    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
+    blit(gridSize);
     
     dtex[e_grid]->swap();
 }
@@ -139,7 +143,8 @@ void World::transfer() {
     sd[e_particle]->uniform1i("V", dtex[e_velocities]->i(1).id);
     
     dtex[e_velocities]->i(0).bind();
-    blit(dtex[e_velocities]->i(0), VAO[0], 0, count, roots);
+    target->bind(dtex[e_velocities]->i(0), GL_FRAMEBUFFER);
+    blit(VAO[0], 0, count, roots);
     
     dtex[e_velocities]->swap();
 }
@@ -150,7 +155,8 @@ void World::enforceBoundary() {
     sd[e_boundry]->uniform1i("V", dtex[e_grid]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    ::blit(dtex[e_grid]->i(0).target->fbo, 0, 0, gridSize.x, gridSize.y);
+    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
+    blit(gridSize);
     
     dtex[e_grid]->swap();
 }
@@ -163,7 +169,8 @@ void World::apply_forces_bound(float dt) {
     sd[e_gridForce]->uniform1i("V", dtex[e_grid]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    ::blit(dtex[e_grid]->i(0).target->fbo, 0, 0, gridSize.x, gridSize.y);
+    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
+    blit(gridSize);
     
     dtex[e_grid]->swap();
 }
@@ -178,7 +185,8 @@ void World::advect_particles(float dt) {
     sd[e_step]->uniform1i("G", dtex[e_grid]->i(1).id);
     
     dtex[e_positions]->i(0).bind();
-    blit(dtex[e_positions]->i(0), VAO[0], 0, count, roots);
+    target->bind(dtex[e_positions]->i(0), GL_FRAMEBUFFER);
+    blit(VAO[0], 0, count, roots);
     
     dtex[e_positions]->swap();
 }
@@ -202,7 +210,8 @@ void World::addRect(float x, float y, int w, int h, float s) {
     sd[e_rect]->uniform1i("root", root);
     
     dtex[e_positions]->i(1).bind();
-    blit(dtex[e_positions]->i(1), VAO[0], count, i, roots);
+    target->bind(dtex[e_positions]->i(1), GL_FRAMEBUFFER);
+    blit(VAO[0], count, i, roots);
     
     count += i;
 }
@@ -217,7 +226,8 @@ void World::addCircle(float x, float y, float r, float s) {
     sd[e_circle]->uniform2f("pos", x, y);
     
     dtex[e_positions]->i(1).bind();
-    blit(dtex[e_positions]->i(1), VAO[0], count, i, roots);
+    target->bind(dtex[e_positions]->i(1), GL_FRAMEBUFFER);
+    blit(VAO[0], count, i, roots);
     
     count += i;
 }
@@ -227,37 +237,47 @@ void World::copyToTemp() {
     sd[e_copy]->uniform1i("T", dtex[e_grid]->i(1).id);
     
     dtex[e_temp]->i(1).bind();
-    ::blit(dtex[e_temp]->i(1).target->fbo, 0, 0, gridSize.x, gridSize.y);
+    target->bind(dtex[e_temp]->i(1), GL_FRAMEBUFFER);
+    blit(gridSize);
 }
 
 
 void World::render(GLuint target, int x, int y, int w, int h) {
+    bool gg = false;
     
-    sd[e_draw]->bind();
-    sd[e_draw]->uniform1i("T", dtex[e_positions]->i(1).id);
-    sd[e_draw]->uniform2f("scl", 1.0f/simSize);
-    sd[e_draw]->uniform1f("size", 2.0f);
+    if(!gg) {
+        
     
-    //glEnable(GL_BLEND);
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, target);
-    glBindVertexArray(VAO[0]);
-    glViewport(x, y, w, h);
-    glDrawArrays(GL_POINTS, 0, count);
-    glBindVertexArray(0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
-    //glDisable(GL_BLEND);
+        sd[e_draw]->bind();
+        sd[e_draw]->uniform1i("T", dtex[e_positions]->i(1).id);
+        sd[e_draw]->uniform2f("scl", 1.0f/simSize);
+        sd[e_draw]->uniform1f("size", 2.0f);
+        
+        //glEnable(GL_BLEND);
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, target);
+        glBindVertexArray(VAO[0]);
+        glViewport(x, y, w, h);
+        glDrawArrays(GL_POINTS, 0, count);
+        glBindVertexArray(0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
+        //glDisable(GL_BLEND);
+        
+    }else{
      
     
-    /*
-    sd[e_show]->bind();
-    sd[e_show]->uniform1i("M", dtex[e_weights]->i(1).id);
-    sd[e_show]->uniform1i("V", dtex[e_grid]->i(1).id);
-    sd[e_show]->uniform2f("invSize", 1.0f/(float)w, 1.0f/(float)h);
     
-    ::blit(target, x, y, w, h);
-    */
+        sd[e_show]->bind();
+        sd[e_show]->uniform1i("M", dtex[e_weights]->i(1).id);
+        sd[e_show]->uniform1i("V", dtex[e_grid]->i(1).id);
+        sd[e_show]->uniform2f("invSize", 1.0f/(float)w, 1.0f/(float)h);
+        sd[e_show]->uniform2f("gridSize", simSize);
+        sd[e_show]->uniform2f("size", w, h);
+        
+        ::blit(target, x, y, w, h);
     
+        
+    }
       
 }

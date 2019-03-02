@@ -205,7 +205,7 @@ struct FrameBuffer
         glDeleteFramebuffers(1, &fbo);
     }
     
-    void bind(const Texture* texture, GLenum x) const;
+    void bind(const Texture& texture, GLenum x) const;
 };
 
 class Texture
@@ -215,7 +215,6 @@ public:
     
     GLuint id;
     GLuint texture;
-    FrameBuffer* target;
     
     Texture(GLenum mode) {
         id = ++texture_count;
@@ -226,30 +225,21 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        
-        target = new FrameBuffer();
     }
     
     ~Texture() {
         glDeleteTextures(1, &texture);
-        delete target;
     }
     
     void image(GLenum iformat, GLenum format, GLuint x, GLuint y, GLenum type, void* pixels)
     {
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexImage2D(GL_TEXTURE_2D, 0, iformat, x, y, 0, format, type, pixels);
-        
-        setFBO(GL_FRAMEBUFFER);
     }
     
-    inline void setFBO(GLenum x) {
-        target->bind(this, x);
-    }
-    
-    inline void clear() {
+    inline void clear(FrameBuffer* target) {
         bind();
-        
+        target->bind(*this, GL_DRAW_FRAMEBUFFER);
         glBindFramebuffer(GL_FRAMEBUFFER, target->fbo);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -301,9 +291,9 @@ public:
         return *(textures[i]);
     }
     
-    inline void clear() {
-        textures[0]->clear();
-        textures[1]->clear();
+    inline void clear(FrameBuffer* target) {
+        textures[0]->clear(target);
+        textures[1]->clear(target);
     }
     
     inline void swap() {

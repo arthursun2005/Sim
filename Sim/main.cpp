@@ -28,6 +28,7 @@ void addFromMouse() {
     int w = 50;
     int h = 50;
     world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, w, h, 0.75f);
+    //world->addCircle((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, 40.0f, 0.75f);
 }
 
 void mouseCallback(GLFWwindow* window, int button, int action, int mods)
@@ -53,7 +54,7 @@ void initialize() {
     world = new World(width * 2 * u, height * 2 * u, 2048);
     
     world->exf.x = 0.0f;
-    world->exf.y = -90.0f;
+    world->exf.y = -80.0f;
 }
 
 void free() {
@@ -108,6 +109,7 @@ int main(int argc, const char * argv[]) {
     glfwSetScrollCallback(window, scrollCallback);
     
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    
     
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);

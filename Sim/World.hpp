@@ -16,6 +16,8 @@ class World
     
 protected:
     
+    FrameBuffer* target;
+    
     enum double_textures
     {
         e_velocities = 0,
@@ -62,7 +64,7 @@ protected:
     glm::vec2 simSize;
     glm::vec2 gridSize;
     
-    int pressure_iterations = 10;
+    int pressure_iterations = 8;
     
     int root;
     glm::vec2 roots;
@@ -73,8 +75,8 @@ public:
     int capacity;
     glm::vec2 exf;
     
-    inline void blit(GLuint target, GLuint vao, int start, int count, const glm::ivec2& _size) {
-        glBindFramebuffer(GL_FRAMEBUFFER, target);
+    inline void blit(GLuint _target, GLuint vao, int start, int count, const glm::ivec2& _size) {
+        glBindFramebuffer(GL_FRAMEBUFFER, _target);
         glBindVertexArray(vao);
         glViewport(0, 0, _size.x, _size.y);
         glDrawArrays(GL_POINTS, start, count);
@@ -82,14 +84,20 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     
-    inline void blit(Texture& tex, GLuint vao, int start, int count, const glm::ivec2& _size) {
-        blit(tex.target->fbo, vao, start, count, _size);
+    inline void blit(const glm::ivec2& _size) {
+        ::blit(target->fbo, 0, 0, _size.x, _size.y);
+    }
+    
+    inline void blit(GLuint vao, int start, int count, const glm::ivec2& _size) {
+        blit(target->fbo, vao, start, count, _size);
     }
     
 public:
     
     World(int x, int y, int r) : simSize(x, y), gridSize(x + 1.0f, y + 1.0f), count(0), root(r), capacity(r * r), exf(0.0f, 0.0f), roots(r, r)
     {
+        target = new FrameBuffer();
+        
         dtex[e_positions] = new DoubleTexture(GL_NEAREST);
         dtex[e_positions]->image(GL_RG32F, GL_RG, root, root, GL_FLOAT, 0);
         
@@ -97,10 +105,10 @@ public:
         dtex[e_velocities]->image(GL_RG32F, GL_RG, root, root, GL_FLOAT, 0);
         
         dtex[e_grid] = new DoubleTexture(GL_LINEAR);
-        dtex[e_grid]->image(GL_RGBA32F, GL_RGBA, x + 1, y + 1, GL_FLOAT, 0);
+        dtex[e_grid]->image(GL_RGBA32F, GL_BGRA, x + 1, y + 1, GL_FLOAT, 0);
         
         dtex[e_temp] = new DoubleTexture(GL_LINEAR);
-        dtex[e_temp]->image(GL_RGBA32F, GL_RGBA, x + 1, y + 1, GL_FLOAT, 0);
+        dtex[e_temp]->image(GL_RGBA32F, GL_BGRA, x + 1, y + 1, GL_FLOAT, 0);
         
         dtex[e_weights] = new DoubleTexture(GL_LINEAR);
         dtex[e_weights]->image(GL_R32F, GL_RED, x , y , GL_FLOAT, 0);
@@ -130,7 +138,7 @@ public:
         sd[e_circle] = new Shader("GLSL/point.vs", "GLSL/circle.fs", "GLSL/shared.glsl");
         
         for(int i = 0; i < dtex_end; ++i) {
-            dtex[i]->clear();
+            dtex[i]->clear(target);
         }
         
         ////////////////////////////
@@ -198,6 +206,8 @@ public:
         for(int i = 0; i < sd_end; ++i) {
             delete sd[i];
         }
+        
+        delete target;
     }
     
     

@@ -1,5 +1,14 @@
 #version 410 core
 
+precision highp float;
+
+vec4 get(in sampler2D T, ivec2 p) {
+    vec4 n = texelFetch(T, p, 0);
+    vec2 x = texelFetch(T, p + ivec2(1, 0), 0).xz;
+    vec2 y = texelFetch(T, p + ivec2(0, 1), 0).yw;
+    return (n + vec4(x.x, y.x, x.y, y.y)) * 0.5;
+}
+
 vec4 get(in sampler2D T, vec2 p, vec2 s) {
     vec2 g = 1.0 + s;
     p = (p + s)/(2.0 * g);
