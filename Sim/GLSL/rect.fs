@@ -13,6 +13,6 @@ void main() {
     int on = k - count;
     int dx = (on%hx) - (hx >> 1);
     int dy = (on/hx) - (hy >> 1);
-    A = pos + vec2(dx * sp, dy * sp) + rand(float(u), gl_FragCoord.xy) - 0.5;
+    A = pos + vec2(dx * sp, dy * sp);
 }
 

@@ -25,10 +25,10 @@ World* world;
 
 void addFromMouse() {
     float k = 2.0f * u;
-    int w = 50;
-    int h = 50;
-    world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, w, h, 0.75f);
-    //world->addCircle((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, 40.0f, 0.75f);
+    int w = 20;
+    int h = 20;
+    world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, w, h, 3.0f);
+    //world->addCircle((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, 40.0f, 3.0f);
 }
 
 void mouseCallback(GLFWwindow* window, int button, int action, int mods)
@@ -39,11 +39,14 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods)
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if(action == GLFW_RELEASE) {
-        if(key ==  GLFW_KEY_C) {
+        if(key == GLFW_KEY_C) {
             printf("%d\n", world->count);
         }
-        if(key ==  GLFW_KEY_W) {
+        if(key == GLFW_KEY_W) {
             world->exf *= -1.0f;
+        }
+        if(key == GLFW_KEY_K) {
+            //world->addRect(0.0f, 0.0f, 600, 40, 0.75f);
         }
     }
 }
@@ -51,10 +54,16 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void initialize() {
     initBases();
     
-    world = new World(width * 2 * u, height * 2 * u, 2048);
+    int w = width * 2 * u;
+    int h = height * 2 * u;
+    
+    printf("sim width: %d\n", w);
+    printf("sim height: %d\n", h);
+    
+    world = new World(w, h, 1024);
     
     world->exf.x = 0.0f;
-    world->exf.y = -60.0f;
+    world->exf.y = -600.0f;
 }
 
 void free() {
@@ -64,8 +73,7 @@ void free() {
 }
 
 void draw() {
-    //world->solvePressure();
-    world->solve_once(dt);
+    world->solve(dt, 1.5f);
     world->render(0, 0, 0, width * 2, height * 2);
 }
 
@@ -120,11 +128,15 @@ int main(int argc, const char * argv[]) {
     int w = 300;
     int h = 300;
     
-    //world->addRect((w * 2.0f - width) * u * 2.0f, (h * 2.0f - height) * u * -2.0f, w, h, 0.75f);
-    world->addCircle(0.0f, 0.0f, 120.0f, 0.75f);
+    float s = 0.75f;
+    
+    world->addRect((w * s * 3.0f - width) * u * 2.0f, (h * s * 3.0f - height) * u * -2.0f, w, h, s);
+    //world->addRect((width - w * 2.0f) * u * 2.0f, (h * 2.0f - height) * u * -2.0f, w, h, 0.75f);
+    //world->addCircle(0.0f, 0.0f, 120.0f, 0.75f);
     
     do {
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        //glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
         glfwGetCursorPos(window, &mouseX, &mouseY);
@@ -142,6 +154,8 @@ int main(int argc, const char * argv[]) {
         if(press == GLFW_PRESS) {
             addFromMouse();
         }
+        
+        //world->addRect(0.0f, (70.0f - height) * u * -2.0f, 20, 20, 4.0f);
         
         draw();
         

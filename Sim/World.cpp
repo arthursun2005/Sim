@@ -8,6 +8,16 @@
 
 #include "World.hpp"
 
+void World::solve(float dt, float its) {
+    solver_record += its;
+    solver_record = solver_record - floorf(solver_record);
+    int i = floorf(its + solver_record);
+    float _dt = dt/(float)i;
+    for(int n = 0; n < i; ++n) {
+        solve_once(_dt);
+    }
+}
+
 void World::solve_once(float dt) {
     // transfering particle velocities to MAC grid
     toGrid();
@@ -53,6 +63,11 @@ void World::toGrid() {
     blit(e_grid, 1, VAO[1], 0, count * 2, gridSize);
     glDisable(GL_BLEND);
     
+    reset_texture_count;
+    
+    
+    
+    dtex[e_grid]->i(1).bind();
     
     sd[e_wvel]->bind();
     sd[e_wvel]->uniform2f("invSize", 1.0f/gridSize);
@@ -115,8 +130,6 @@ void World::calDivergence() {
 }
 
 void World::solvePressure() {
-    
-    
     dtex[e_divergence]->i(1).bind();
     dtex[e_weights]->i(1).bind();
     dtex[e_pressures]->i(1).bind();
@@ -135,7 +148,6 @@ void World::solvePressure() {
     dtex[e_pressures]->swap();
     
     reset_texture_count;
-    
 }
 
 void World::solveGrid() {
@@ -235,6 +247,7 @@ void World::advect_particles(float dt) {
 
 
 
+
 void World::addRect(float x, float y, int w, int h, float s) {
     int i = w * h;
     
@@ -297,21 +310,17 @@ void World::render(GLuint _target, int x, int y, int w, int h) {
         sd[e_draw]->uniform2f("scl", 1.0f/simSize);
         sd[e_draw]->uniform1f("size", 2.0f);
         
-        //glEnable(GL_BLEND);
-        
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _target);
         glBindVertexArray(VAO[0]);
         glViewport(x, y, w, h);
         glDrawArrays(GL_POINTS, 0, count);
         glBindVertexArray(0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        
-        //glDisable(GL_BLEND);
-        
+                
         reset_texture_count;
     }else{
-     
-    
+        dtex[e_weights]->i(1).bind();
+        dtex[e_grid]->i(1).bind();
     
         sd[e_show]->bind();
         sd[e_show]->uniform1i("M", dtex[e_weights]->i(1).id);
@@ -322,7 +331,7 @@ void World::render(GLuint _target, int x, int y, int w, int h) {
         
         ::blit(_target, x, y, w, h);
     
-        
+        reset_texture_count;
     }
       
 }

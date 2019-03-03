@@ -62,10 +62,12 @@ protected:
     glm::vec2 simSize;
     glm::vec2 gridSize;
     
-    int pressure_iterations = 60;
+    int pressure_iterations = 80;
     
     int root;
     glm::vec2 roots;
+    
+    float solver_record = 0.0f;
     
 public:
     
@@ -89,6 +91,30 @@ public:
     inline void blit(int x, int i, GLuint vao, int start, int count, const glm::ivec2& _size) {
         blit(dtex[x]->i(i).target->fbo, vao, start, count, _size);
     }
+    
+    void solve_once(float dt);
+    
+    void weight();
+    
+    void apply_forces_bound(float dt);
+    
+    void enforceBoundary();
+    
+    void transfer();
+    
+    void extend();
+    
+    void copyToTemp();
+    
+    void advect_particles(float dt);
+    
+    void toGrid();
+    
+    void calDivergence();
+    
+    void solvePressure();
+    
+    void solveGrid();
     
 public:
     
@@ -205,32 +231,9 @@ public:
     }
     
     
-    
-    void toGrid();
-    
-    void calDivergence();
-    
-    void solvePressure();
-    
-    void solveGrid();
-    
-    void solve_once(float dt);
-    
-    void weight();
-    
-    void apply_forces_bound(float dt);
-    
-    void enforceBoundary();
-    
-    void transfer();
-    
-    void extend();
-    
-    void copyToTemp();
-        
+    void solve(float dt, float its);
     
     
-    void advect_particles(float dt);
     
     void addCircle(float x, float y, float r, float s);
     
