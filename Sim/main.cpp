@@ -54,7 +54,7 @@ void initialize() {
     world = new World(width * 2 * u, height * 2 * u, 2048);
     
     world->exf.x = 0.0f;
-    world->exf.y = -80.0f;
+    world->exf.y = -60.0f;
 }
 
 void free() {
@@ -64,6 +64,7 @@ void free() {
 }
 
 void draw() {
+    //world->solvePressure();
     world->solve_once(dt);
     world->render(0, 0, 0, width * 2, height * 2);
 }
@@ -110,7 +111,6 @@ int main(int argc, const char * argv[]) {
     
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     
-    
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
     
@@ -121,12 +121,11 @@ int main(int argc, const char * argv[]) {
     int h = 300;
     
     //world->addRect((w * 2.0f - width) * u * 2.0f, (h * 2.0f - height) * u * -2.0f, w, h, 0.75f);
-    world->addCircle(0.0f, 0.0f, 120.0f, 0.5f);
+    world->addCircle(0.0f, 0.0f, 120.0f, 0.75f);
     
     do {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        
         
         glfwGetCursorPos(window, &mouseX, &mouseY);
         

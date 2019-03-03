@@ -169,10 +169,10 @@ void checkProgram(GLuint x) {
     }
 }
 
-void FrameBuffer::bind(const Texture& texture, GLenum x) const
+void FrameBuffer::bind(const Texture* texture, GLenum x) const
 {
     glBindFramebuffer(x, fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.texture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->texture, 0);
     assert(glCheckFramebufferStatus(x) == GL_FRAMEBUFFER_COMPLETE);
     glBindFramebuffer(x, 0);
 }

@@ -25,7 +25,8 @@ void World::solve_once(float dt) {
     calDivergence();
     
     // solve pressure from that
-    solvePressure();
+    for(int n = 0; n < pressure_iterations; ++n)
+        solvePressure();
     
     // solving the grid
     solveGrid();
@@ -36,7 +37,10 @@ void World::solve_once(float dt) {
 }
 
 void World::toGrid() {
-    dtex[e_grid]->i(1).clear(target);
+    dtex[e_positions]->i(1).bind();
+    dtex[e_velocities]->i(1).bind();
+    
+    dtex[e_grid]->i(1).clear();
     
     sd[e_partToGrid]->bind();
     sd[e_partToGrid]->uniform1i("P", dtex[e_positions]->i(1).id);
@@ -45,10 +49,8 @@ void World::toGrid() {
     
     dtex[e_grid]->i(1).bind();
     
-    target->bind(dtex[e_grid]->i(1), GL_FRAMEBUFFER);
-    
     glEnable(GL_BLEND);
-    blit(VAO[1], 0, count * 2, gridSize);
+    blit(e_grid, 1, VAO[1], 0, count * 2, gridSize);
     glDisable(GL_BLEND);
     
     
@@ -57,26 +59,32 @@ void World::toGrid() {
     sd[e_wvel]->uniform1i("V", dtex[e_grid]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
-    blit(gridSize);
+    blit(e_grid, 0, gridSize);
     
     dtex[e_grid]->swap();
+    
+    reset_texture_count;
 }
 
 void World::extend() {
+    dtex[e_grid]->i(1).bind();
+    
     sd[e_extend]->bind();
     sd[e_extend]->uniform2f("invSize", 1.0f/gridSize);
     sd[e_extend]->uniform1i("V", dtex[e_grid]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
-    blit(gridSize);
+    blit(e_grid, 0, gridSize);
     
     dtex[e_grid]->swap();
+    
+    reset_texture_count;
 }
 
 void World::weight() {
-    dtex[e_weights]->i(1).clear(target);
+    dtex[e_positions]->i(1).bind();
+    
+    dtex[e_weights]->i(1).clear();
     
     sd[e_weight]->bind();
     sd[e_weight]->uniform1i("T", dtex[e_positions]->i(1).id);
@@ -84,41 +92,57 @@ void World::weight() {
     sd[e_weight]->uniform1f("size", 1.0f);
     
     dtex[e_weights]->i(1).bind();
-    target->bind(dtex[e_weights]->i(1), GL_FRAMEBUFFER);
     glEnable(GL_BLEND);
-    blit(VAO[0], 0, count, simSize);
+    blit(e_weights, 1, VAO[0], 0, count, simSize);
     glDisable(GL_BLEND);
+    
+    reset_texture_count;
 }
 
 void World::calDivergence() {
+    dtex[e_grid]->i(1).bind();
+    dtex[e_weights]->i(1).bind();
+    
     sd[e_div]->bind();
     sd[e_div]->uniform2f("invSize", 1.0f/gridSize);
     sd[e_div]->uniform1i("V", dtex[e_grid]->i(1).id);
     sd[e_div]->uniform1i("M", dtex[e_weights]->i(1).id);
     
     dtex[e_divergence]->i(1).bind();
-    target->bind(dtex[e_divergence]->i(1), GL_FRAMEBUFFER);
-    blit(simSize);
+    blit(e_divergence, 1, simSize);
+    
+    reset_texture_count;
 }
 
 void World::solvePressure() {
+    
+    
+    dtex[e_divergence]->i(1).bind();
+    dtex[e_weights]->i(1).bind();
+    dtex[e_pressures]->i(1).bind();
+    
+    
     sd[e_pre]->bind();
     sd[e_pre]->uniform2f("invSize", 1.0f/simSize);
     sd[e_pre]->uniform1i("D", dtex[e_divergence]->i(1).id);
     sd[e_pre]->uniform1i("M", dtex[e_weights]->i(1).id);
+
+    sd[e_pre]->uniform1i("P", dtex[e_pressures]->i(1).id);
     
-    for(int n = 0; n < pressure_iterations; ++n) {
-        sd[e_pre]->uniform1i("P", dtex[e_pressures]->i(1).id);
-        
-        dtex[e_pressures]->i(0).bind();
-        target->bind(dtex[e_pressures]->i(0), GL_FRAMEBUFFER);
-        blit(simSize);
-        
-        dtex[e_pressures]->swap();
-    }
+    dtex[e_pressures]->i(0).bind();
+    blit(e_pressures, 0, simSize);
+    
+    dtex[e_pressures]->swap();
+    
+    reset_texture_count;
+    
 }
 
 void World::solveGrid() {
+    dtex[e_pressures]->i(1).bind();
+    dtex[e_grid]->i(1).bind();
+    dtex[e_weights]->i(1).bind();
+    
     sd[e_subtract]->bind();
     sd[e_subtract]->uniform2f("invGrid", 1.0f/gridSize);
     sd[e_subtract]->uniform2f("invSize", 1.0f/simSize);
@@ -127,13 +151,19 @@ void World::solveGrid() {
     sd[e_subtract]->uniform1i("W", dtex[e_weights]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
-    blit(gridSize);
+    blit(e_grid, 0, gridSize);
     
     dtex[e_grid]->swap();
+    
+    reset_texture_count;
 }
 
 void World::transfer() {
+    dtex[e_temp]->i(1).bind();
+    dtex[e_positions]->i(1).bind();
+    dtex[e_grid]->i(1).bind();
+    dtex[e_velocities]->i(1).bind();
+    
     sd[e_particle]->bind();
     sd[e_particle]->uniform2f("invSize", 1.0f/roots);
     sd[e_particle]->uniform2f("size", simSize);
@@ -143,10 +173,11 @@ void World::transfer() {
     sd[e_particle]->uniform1i("V", dtex[e_velocities]->i(1).id);
     
     dtex[e_velocities]->i(0).bind();
-    target->bind(dtex[e_velocities]->i(0), GL_FRAMEBUFFER);
-    blit(VAO[0], 0, count, roots);
+    blit(e_velocities, 0, VAO[0], 0, count, roots);
     
     dtex[e_velocities]->swap();
+    
+    reset_texture_count;
 }
 
 void World::enforceBoundary() {
@@ -155,13 +186,14 @@ void World::enforceBoundary() {
     sd[e_boundry]->uniform1i("V", dtex[e_grid]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
-    blit(gridSize);
+    blit(e_grid, 0, gridSize);
     
     dtex[e_grid]->swap();
 }
 
 void World::apply_forces_bound(float dt) {
+    dtex[e_grid]->i(1).bind();
+    
     sd[e_gridForce]->bind();
     sd[e_gridForce]->uniform1f("dt", dt);
     sd[e_gridForce]->uniform2f("exf", exf);
@@ -169,13 +201,18 @@ void World::apply_forces_bound(float dt) {
     sd[e_gridForce]->uniform1i("V", dtex[e_grid]->i(1).id);
     
     dtex[e_grid]->i(0).bind();
-    target->bind(dtex[e_grid]->i(0), GL_FRAMEBUFFER);
-    blit(gridSize);
+    blit(e_grid, 0, gridSize);
     
     dtex[e_grid]->swap();
+    
+    reset_texture_count;
 }
 
 void World::advect_particles(float dt) {
+    dtex[e_grid]->i(1).bind();
+    dtex[e_positions]->i(1).bind();
+    dtex[e_velocities]->i(1).bind();
+    
     sd[e_step]->bind();
     sd[e_step]->uniform2f("invSize", 1.0f/roots);
     sd[e_step]->uniform2f("size", simSize);
@@ -183,12 +220,14 @@ void World::advect_particles(float dt) {
     sd[e_step]->uniform1i("V", dtex[e_velocities]->i(1).id);
     sd[e_step]->uniform1i("P", dtex[e_positions]->i(1).id);
     sd[e_step]->uniform1i("G", dtex[e_grid]->i(1).id);
+    sd[e_step]->uniform1f("seed", time(0));
     
     dtex[e_positions]->i(0).bind();
-    target->bind(dtex[e_positions]->i(0), GL_FRAMEBUFFER);
-    blit(VAO[0], 0, count, roots);
+    blit(e_positions, 0, VAO[0], 0, count, roots);
     
     dtex[e_positions]->swap();
+    
+    reset_texture_count;
 }
 
 
@@ -210,10 +249,11 @@ void World::addRect(float x, float y, int w, int h, float s) {
     sd[e_rect]->uniform1i("root", root);
     
     dtex[e_positions]->i(1).bind();
-    target->bind(dtex[e_positions]->i(1), GL_FRAMEBUFFER);
-    blit(VAO[0], count, i, roots);
+    blit(e_positions, 1, VAO[0], count, i, roots);
     
     count += i;
+    
+    reset_texture_count;
 }
 
 void World::addCircle(float x, float y, float r, float s) {
@@ -226,28 +266,32 @@ void World::addCircle(float x, float y, float r, float s) {
     sd[e_circle]->uniform2f("pos", x, y);
     
     dtex[e_positions]->i(1).bind();
-    target->bind(dtex[e_positions]->i(1), GL_FRAMEBUFFER);
-    blit(VAO[0], count, i, roots);
+    blit(e_positions, 1, VAO[0], count, i, roots);
     
     count += i;
+    
+    reset_texture_count;
 }
 
 void World::copyToTemp() {
+    dtex[e_grid]->i(1).bind();
+    
     sd[e_copy]->bind();
     sd[e_copy]->uniform1i("T", dtex[e_grid]->i(1).id);
     
     dtex[e_temp]->i(1).bind();
-    target->bind(dtex[e_temp]->i(1), GL_FRAMEBUFFER);
-    blit(gridSize);
+    blit(e_temp, 1, gridSize);
+    
+    reset_texture_count;
 }
 
 
-void World::render(GLuint target, int x, int y, int w, int h) {
+void World::render(GLuint _target, int x, int y, int w, int h) {
     bool gg = false;
     
     if(!gg) {
+        dtex[e_positions]->i(1).bind();
         
-    
         sd[e_draw]->bind();
         sd[e_draw]->uniform1i("T", dtex[e_positions]->i(1).id);
         sd[e_draw]->uniform2f("scl", 1.0f/simSize);
@@ -255,7 +299,7 @@ void World::render(GLuint target, int x, int y, int w, int h) {
         
         //glEnable(GL_BLEND);
         
-        glBindFramebuffer(GL_FRAMEBUFFER, target);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _target);
         glBindVertexArray(VAO[0]);
         glViewport(x, y, w, h);
         glDrawArrays(GL_POINTS, 0, count);
@@ -264,6 +308,7 @@ void World::render(GLuint target, int x, int y, int w, int h) {
         
         //glDisable(GL_BLEND);
         
+        reset_texture_count;
     }else{
      
     
@@ -275,7 +320,7 @@ void World::render(GLuint target, int x, int y, int w, int h) {
         sd[e_show]->uniform2f("gridSize", simSize);
         sd[e_show]->uniform2f("size", w, h);
         
-        ::blit(target, x, y, w, h);
+        ::blit(_target, x, y, w, h);
     
         
     }

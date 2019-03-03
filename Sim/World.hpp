@@ -16,8 +16,6 @@ class World
     
 protected:
     
-    FrameBuffer* target;
-    
     enum double_textures
     {
         e_velocities = 0,
@@ -64,7 +62,7 @@ protected:
     glm::vec2 simSize;
     glm::vec2 gridSize;
     
-    int pressure_iterations = 8;
+    int pressure_iterations = 60;
     
     int root;
     glm::vec2 roots;
@@ -84,20 +82,18 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     
-    inline void blit(const glm::ivec2& _size) {
-        ::blit(target->fbo, 0, 0, _size.x, _size.y);
+    inline void blit(int x, int i, const glm::ivec2& _size) {
+        ::blit(dtex[x]->i(i).target->fbo, 0, 0, _size.x, _size.y);
     }
     
-    inline void blit(GLuint vao, int start, int count, const glm::ivec2& _size) {
-        blit(target->fbo, vao, start, count, _size);
+    inline void blit(int x, int i, GLuint vao, int start, int count, const glm::ivec2& _size) {
+        blit(dtex[x]->i(i).target->fbo, vao, start, count, _size);
     }
     
 public:
     
     World(int x, int y, int r) : simSize(x, y), gridSize(x + 1.0f, y + 1.0f), count(0), root(r), capacity(r * r), exf(0.0f, 0.0f), roots(r, r)
     {
-        target = new FrameBuffer();
-        
         dtex[e_positions] = new DoubleTexture(GL_NEAREST);
         dtex[e_positions]->image(GL_RG32F, GL_RG, root, root, GL_FLOAT, 0);
         
@@ -138,7 +134,7 @@ public:
         sd[e_circle] = new Shader("GLSL/point.vs", "GLSL/circle.fs", "GLSL/shared.glsl");
         
         for(int i = 0; i < dtex_end; ++i) {
-            dtex[i]->clear(target);
+            dtex[i]->clear();
         }
         
         ////////////////////////////
@@ -206,8 +202,6 @@ public:
         for(int i = 0; i < sd_end; ++i) {
             delete sd[i];
         }
-        
-        delete target;
     }
     
     
