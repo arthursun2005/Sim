@@ -9,6 +9,7 @@
 #include "World.hpp"
 
 void World::solve(float dt, float its) {
+    if(its < 1.0f) return;
     solver_record += its;
     solver_record = solver_record - floorf(solver_record);
     int i = floorf(its + solver_record);
@@ -183,6 +184,7 @@ void World::transfer() {
     sd[e_particle]->uniform1i("P", dtex[e_positions]->i(1).id);
     sd[e_particle]->uniform1i("G", dtex[e_grid]->i(1).id);
     sd[e_particle]->uniform1i("V", dtex[e_velocities]->i(1).id);
+    sd[e_particle]->uniform1f("damp", 1.0f);
     
     dtex[e_velocities]->i(0).bind();
     blit(e_velocities, 0, VAO[0], 0, count, roots);
@@ -232,7 +234,7 @@ void World::advect_particles(float dt) {
     sd[e_step]->uniform1i("V", dtex[e_velocities]->i(1).id);
     sd[e_step]->uniform1i("P", dtex[e_positions]->i(1).id);
     sd[e_step]->uniform1i("G", dtex[e_grid]->i(1).id);
-    sd[e_step]->uniform1f("seed", time(0));
+    sd[e_step]->uniform1f("seed", glfwGetTime());
     
     dtex[e_positions]->i(0).bind();
     blit(e_positions, 0, VAO[0], 0, count, roots);
@@ -249,6 +251,7 @@ void World::advect_particles(float dt) {
 
 
 void World::addRect(float x, float y, int w, int h, float s) {
+    w /= s;h /= s;
     int i = w * h;
     
     assert(count + i <= capacity);

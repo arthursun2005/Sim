@@ -15,7 +15,6 @@ void main() {
     vec2 h = pos0 + vel0 * dt * 0.5;
     vec2 vel1 = get(G, h, size).xy;
     pos0 += vel1 * dt;
-    pos0 += (rand(dot(pos0, vel0) * seed, gl_FragCoord.xy) - 0.5) * dt * length(vel0) * 0.02;
     pos0 = clamp(pos0, -size, size);
     pos = pos0;
 }

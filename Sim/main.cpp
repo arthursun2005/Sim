@@ -27,7 +27,7 @@ void addFromMouse() {
     float k = 2.0f * u;
     int w = 20;
     int h = 20;
-    world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, w, h, 3.0f);
+    world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, w, h, 1.0f);
     //world->addCircle((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, 40.0f, 3.0f);
 }
 
@@ -125,12 +125,12 @@ int main(int argc, const char * argv[]) {
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     
-    int w = 300;
-    int h = 300;
+    int w = 200;
+    int h = 200;
     
     float s = 0.75f;
     
-    world->addRect((w * s * 3.0f - width) * u * 2.0f, (h * s * 3.0f - height) * u * -2.0f, w, h, s);
+    world->addRect((w * 3.0f - width) * u * 2.0f, (h * 3.0f - height) * u * -2.0f, w, h, s);
     //world->addRect((width - w * 2.0f) * u * 2.0f, (h * 2.0f - height) * u * -2.0f, w, h, 0.75f);
     //world->addCircle(0.0f, 0.0f, 120.0f, 0.75f);
     

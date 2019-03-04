@@ -6,6 +6,7 @@ uniform sampler2D G;
 uniform sampler2D T;
 uniform vec2 invSize;
 uniform vec2 size;
+uniform float damp;
 
 void main() {
     ivec2 coord = ivec2(gl_FragCoord.xy);
@@ -14,5 +15,5 @@ void main() {
     vec2 gv = get(G, pos0, size).xy;
     vec2 gt = get(T, pos0, size).xy;
     vec2 fv = vel0 + (gv - gt);
-    vel = mix(gv, fv, 0.0);
+    vel = mix(gv, fv, 0.95) * damp;
 }
