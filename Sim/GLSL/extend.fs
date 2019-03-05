@@ -15,10 +15,13 @@ void main() {
     for(float x = -R; x <= R; x += 1.0) {
         for(float y = -R; y <= R; y += 1.0) {
             vec4 v = texture(V, coord + vec2(x, y) * invSize);
-            sum += w * v.zw * v.xy;
+            sum += w * v.xy * v.zw;
             weight += w * v.zw;
+            ww += w * v.zw * v.zw;
         }
     }
-    A = ct + vec4(sum / (weight + (1.0 - sign(weight))), 0.0, 0.0);
+    weight = weight + (1.0 - sign(weight));
+    //A = ct + vec4(sum / weight, ww / weight);
+    A = ct + vec4(sum / weight, 0.0, 0.0);
 }
 

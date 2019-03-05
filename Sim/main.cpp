@@ -131,7 +131,7 @@ int main(int argc, const char * argv[]) {
     float s = 0.75f;
     
     world->addRect((w * 3.0f - width) * u * 2.0f, (h * 3.0f - height) * u * -2.0f, w, h, s);
-    //world->addRect((width - w * 2.0f) * u * 2.0f, (h * 2.0f - height) * u * -2.0f, w, h, 0.75f);
+    //world->addRect((width - w * 3.0f) * u * 2.0f, (h * 3.0f - height) * u * -2.0f, w, h, 0.75f);
     //world->addCircle(0.0f, 0.0f, 120.0f, 0.75f);
     
     do {

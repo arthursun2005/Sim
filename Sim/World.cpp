@@ -159,6 +159,7 @@ void World::solveGrid() {
     sd[e_subtract]->uniform1i("U", dtex[e_pressures]->i(1).id);
     sd[e_subtract]->uniform1i("V", dtex[e_grid]->i(1).id);
     sd[e_subtract]->uniform1i("W", dtex[e_weights]->i(1).id);
+    sd[e_subtract]->uniform2f("invSize", 1.0f/simSize);
     
     dtex[e_grid]->i(0).bind();
     blit(e_grid, 0, gridSize);
@@ -175,7 +176,6 @@ void World::transfer() {
     dtex[e_velocities]->i(1).bind();
     
     sd[e_particle]->bind();
-    sd[e_particle]->uniform2f("invSize", 1.0f/roots);
     sd[e_particle]->uniform2f("size", simSize);
     sd[e_particle]->uniform1i("T", dtex[e_temp]->i(1).id);
     sd[e_particle]->uniform1i("P", dtex[e_positions]->i(1).id);

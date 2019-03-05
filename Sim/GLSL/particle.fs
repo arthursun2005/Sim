@@ -4,7 +4,6 @@ uniform sampler2D V;
 uniform sampler2D P;
 uniform sampler2D G;
 uniform sampler2D T;
-uniform vec2 invSize;
 uniform vec2 size;
 uniform float damp;
 

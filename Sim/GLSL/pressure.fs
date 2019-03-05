@@ -7,7 +7,7 @@ uniform vec2 invSize;
 
 void main() {
     vec2 coord = gl_FragCoord.xy * invSize;
-    
+        
     float w = texture(M, coord - vec2(invSize.x, 0.0)).x;
     float e = texture(M, coord + vec2(invSize.x, 0.0)).x;
     float n = texture(M, coord + vec2(0.0, invSize.y)).x;
