@@ -120,7 +120,6 @@ void World::calDivergence() {
     dtex[e_weights]->i(1).bind();
     
     sd[e_div]->bind();
-    sd[e_div]->uniform2f("invSize", 1.0f/gridSize);
     sd[e_div]->uniform1i("V", dtex[e_grid]->i(1).id);
     sd[e_div]->uniform1i("M", dtex[e_weights]->i(1).id);
     
@@ -157,8 +156,6 @@ void World::solveGrid() {
     dtex[e_weights]->i(1).bind();
     
     sd[e_subtract]->bind();
-    sd[e_subtract]->uniform2f("invGrid", 1.0f/gridSize);
-    sd[e_subtract]->uniform2f("invSize", 1.0f/simSize);
     sd[e_subtract]->uniform1i("U", dtex[e_pressures]->i(1).id);
     sd[e_subtract]->uniform1i("V", dtex[e_grid]->i(1).id);
     sd[e_subtract]->uniform1i("W", dtex[e_weights]->i(1).id);

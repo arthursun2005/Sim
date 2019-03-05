@@ -3,21 +3,23 @@ layout (location = 0) out vec4 vel;
 uniform sampler2D V;
 uniform sampler2D U;
 uniform sampler2D W;
-uniform vec2 invSize;
-uniform vec2 invGrid;
+
+float pressure(in ivec2 c) {
+    return texelFetch(U, max(c, 0), 0).x;
+}
 
 void main() {
-    vec2 coord = gl_FragCoord.xy * invGrid;
-    vec2 coord2 = gl_FragCoord.xy * invSize;
-    float w = texture(W, coord2).x;
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    
+    float w = texelFetch(W, coord, 0).x;
     
     if(w == 0.0)
         discard;
     
-    vec4 vel0 = texture(V, coord);
-    float n = texture(U, coord2).x;
-    float x = texture(U, coord2 - vec2(invSize.x, 0.0)).x;
-    float y = texture(U, coord2 - vec2(0.0, invSize.y)).x;
+    vec4 vel0 = texelFetch(V, coord, 0);
+    float n = texelFetch(U, coord, 0).x;
+    float x = pressure(coord - ivec2(1, 0));
+    float y = pressure(coord - ivec2(0, 1));
     vec2 s = n - vec2(x, y);
     vel0.xy -= s;
     vel = vel0;

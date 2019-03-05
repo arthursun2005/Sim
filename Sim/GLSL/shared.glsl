@@ -1,6 +1,6 @@
 #version 410 core
 
-precision mediump float;
+precision highp float;
 
 vec4 get(in sampler2D T, ivec2 p) {
     vec4 n = texelFetch(T, p, 0);

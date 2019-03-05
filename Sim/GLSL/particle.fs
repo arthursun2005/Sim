@@ -15,5 +15,5 @@ void main() {
     vec2 gv = get(G, pos0, size).xy;
     vec2 gt = get(T, pos0, size).xy;
     vec2 fv = vel0 + (gv - gt);
-    vel = mix(gv, fv, 0.95) * damp;
+    vel = mix(gv, fv, 0.0) * damp;
 }

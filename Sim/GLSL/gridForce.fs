@@ -19,7 +19,7 @@ void main() {
     }
      */
     
-    vec2 pos = gl_FragCoord.xy;
+    vec2 pos = gl_FragCoord.xy + vel0.xy * dt * 0.5;
     
     float s = 0.0;
     
