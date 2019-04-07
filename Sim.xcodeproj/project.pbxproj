@@ -52,11 +52,13 @@
 		8E219B3A22252FB200DA7D8A /* weight.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = weight.fs; sourceTree = "<group>"; };
 		8E219B3B222530A800DA7D8A /* weightVel.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = weightVel.fs; sourceTree = "<group>"; };
 		8E219B3C2225331600DA7D8A /* pressure.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = pressure.fs; sourceTree = "<group>"; };
+		8E30E5EB223CC270004F9CD5 /* draw.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = draw.vs; sourceTree = "<group>"; };
 		8E4C8946222534AB0073A866 /* subtract.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = subtract.fs; sourceTree = "<group>"; };
 		8E4C8947222538170073A866 /* rect.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = rect.fs; sourceTree = "<group>"; };
 		8E4C89482225397A0073A866 /* point.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = point.vs; sourceTree = "<group>"; };
 		8E4C894922253AA00073A866 /* step.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = step.fs; sourceTree = "<group>"; };
 		8E4C894A222543010073A866 /* force.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = force.fs; sourceTree = "<group>"; };
+		8E6F139122334E45000D9FCB /* set.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = set.fs; sourceTree = "<group>"; };
 		8EBA3DFA2225EDA20044CD84 /* extend.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = extend.fs; sourceTree = "<group>"; };
 		8EBA3DFC222737FC0044CD84 /* boundry.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = boundry.fs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -123,10 +125,12 @@
 				8E219B302223DD6C00DA7D8A /* texture.vs */,
 				8E4C89482225397A0073A866 /* point.vs */,
 				8E219B3A22252FB200DA7D8A /* weight.fs */,
-				8E219B332223DFDE00DA7D8A /* draw.fs */,
-				8E219B34222524A400DA7D8A /* grid.vs */,
-				8E219B35222524A400DA7D8A /* grid.fs */,
 				8EBA3DFA2225EDA20044CD84 /* extend.fs */,
+				8E219B34222524A400DA7D8A /* grid.vs */,
+				8E6F139122334E45000D9FCB /* set.fs */,
+				8E30E5EB223CC270004F9CD5 /* draw.vs */,
+				8E219B332223DFDE00DA7D8A /* draw.fs */,
+				8E219B35222524A400DA7D8A /* grid.fs */,
 				8E4C8947222538170073A866 /* rect.fs */,
 				8E2090B0222A4F930090D875 /* circle.fs */,
 				8E219B3922252E3500DA7D8A /* divergence.fs */,

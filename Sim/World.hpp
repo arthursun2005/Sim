@@ -47,14 +47,15 @@ protected:
         e_gridForce,
         e_copy,
         e_circle,
+        e_set,
         sd_end
     };
     
     DoubleTexture* dtex[dtex_end];
     Shader* sd[sd_end];
     
-    static const int n_vao = 2;
-    static const int n_vbo = 2;
+    static const int n_vao = 1;
+    static const int n_vbo = 1;
     
     GLuint VAO[n_vao];
     GLuint VBO[n_vbo];
@@ -92,11 +93,11 @@ public:
         blit(dtex[x]->i(i).target->fbo, vao, start, count, _size);
     }
     
-    void solve_once(float dt);
+    void solve_once();
     
     void weight();
     
-    void apply_forces_bound(float dt);
+    void apply_forces_bound();
     
     void enforceBoundary();
     
@@ -106,7 +107,7 @@ public:
     
     void copyToTemp();
     
-    void advect_particles(float dt);
+    void advect_particles();
     
     void toGrid();
     
@@ -117,6 +118,8 @@ public:
     void solveGrid();
     
 public:
+    
+    float dt;
     
     World(int x, int y, int r) : simSize(x, y), gridSize(x + 1.0f, y + 1.0f), count(0), root(r), capacity(r * r), exf(0.0f, 0.0f), roots(r, r)
     {
@@ -141,7 +144,7 @@ public:
         dtex[e_divergence] = new DoubleTexture(GL_LINEAR);
         dtex[e_divergence]->image(GL_R32F, GL_RED, x, y , GL_FLOAT, 0);
         
-        sd[e_draw] = new Shader("GLSL/texture.vs", "GLSL/draw.fs", "GLSL/shared.glsl");
+        sd[e_draw] = new Shader("GLSL/draw.vs", "GLSL/draw.fs", "GLSL/shared.glsl");
         sd[e_partToGrid] = new Shader("GLSL/grid.vs", "GLSL/grid.fs", "GLSL/shared.glsl");
         sd[e_div] = new Shader("GLSL/pass.vs", "GLSL/divergence.fs", "GLSL/shared.glsl");
         sd[e_pre] = new Shader("GLSL/pass.vs", "GLSL/pressure.fs", "GLSL/shared.glsl");
@@ -158,6 +161,7 @@ public:
         sd[e_gridForce] = new Shader("GLSL/pass.vs", "GLSL/gridForce.fs", "GLSL/shared.glsl");
         sd[e_copy] = new Shader("GLSL/pass.vs", "GLSL/copy.fs", "GLSL/shared.glsl");
         sd[e_circle] = new Shader("GLSL/point.vs", "GLSL/circle.fs", "GLSL/shared.glsl");
+        sd[e_set] = new Shader("GLSL/point.vs", "GLSL/set.fs", "GLSL/shared.glsl");
         
         for(int i = 0; i < dtex_end; ++i) {
             dtex[i]->clear();
@@ -190,31 +194,6 @@ public:
         
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
-        
-        
-        
-        
-        texels.resize(capacity * 4);
-        
-        
-        for(int py = 0; py < root; ++py) {
-            for(int px = 0; px < root; ++px) {
-                int i = (px + py * root) * 4;
-                texels[i + 2] = texels[i + 0] = (px + 0.5f) / (float)root;
-                texels[i + 3] = texels[i + 1] = (py + 0.5f) / (float)root;
-            }
-        }
-        
-        
-        glBindVertexArray(VAO[1]);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-        
-        glBufferData(GL_ARRAY_BUFFER, 4 * capacity * sizeof(float), texels.data(), GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-        
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
     }
     
     ~World() {
@@ -231,13 +210,17 @@ public:
     }
     
     
-    void solve(float dt, float its);
+    void solve(float its);
     
     
     
-    void addCircle(float x, float y, float r, float s);
+    int addCircle(float x, float y, float r, float s);
     
-    void addRect(float x, float y, int w, int h, float s);
+    int addRect(float x, float y, float w, float h, float s);
+    
+    void addRect(float x, float y, float w, float h, float s, float vx, float vy);
+    
+    void addCircle(float x, float y, float r, float s, float vx, float vy);
     
     
     

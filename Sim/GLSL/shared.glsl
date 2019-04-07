@@ -1,6 +1,8 @@
 #version 410 core
 
-precision highp float;
+#define pi 3.141592654
+
+precision mediump float;
 
 vec4 get(in sampler2D T, ivec2 p) {
     vec4 n = texelFetch(T, p, 0);
@@ -18,8 +20,14 @@ vec4 get(in sampler2D T, vec2 p, vec2 s) {
     return (n + vec4(x.x, y.x, x.y, y.y)) * 0.5;
 }
 
-vec2 rand(float seed, vec2 coord) {
+vec2 rand2(float seed, vec2 coord) {
     float x = fract(cos(distance(vec2(seed * 12.22334 + 2.2123311, 9.12524 + seed * 0.1631), coord.yx)) * seed);
     float y = fract(sin(distance(vec2(121.151236 + seed * 0.12631, seed * 141.923453 + 8.9162422), coord.xy)) * seed);
-    return vec2(x, y);
+    return vec2(x, y) * 2.0 - 1.0;
+}
+
+vec2 rand(float seed, vec2 coord) {
+    float x = mod(cos(distance(vec2(seed * 9.22334 + 2.2123311, 9.12524 + seed * 0.1631), coord.yx)) * seed, 2.0 * pi);
+    float y = fract(sin(distance(vec2(12.9188346 + seed * 0.112631, seed * 141.923453 + 8.9162422), coord.xy)) * seed);
+    return vec2(cos(x), sin(x)) * y;
 }

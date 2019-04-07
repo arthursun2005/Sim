@@ -10,8 +10,8 @@ void main() {
     float x = texelFetch(V, coord + ivec2(1, 0), 0).x;
     float y = texelFetch(V, coord + ivec2(0, 1), 0).y;
     float div = ((x - n.x) + (y - n.y));
-    float mw = 8.0;
-    div -= max((w - mw) * 1.0, 0.0);
+    float mw = 8.0f;
+    div -= max(w - mw, 0.0f) * 0.25f;
     D = div;
 }
 

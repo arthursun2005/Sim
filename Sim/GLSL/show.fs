@@ -10,11 +10,7 @@ void main() {
     vec2 coord = gl_FragCoord.xy * invSize;
     float m = texture(M, coord).x;
     vec4 w = get(V, ivec2(gl_FragCoord.xy * gridSize / size));
-    if(m == 0.0) {
-        A = vec4(0.0, 0.0, 0.0, 1.0);
-        discard;
-    }
-    A = vec4(0.1, 0.1, 1.0, 1.0) + vec4(0.003, 0.003, 0.0, 0.0) * length(w.xy);
+    A = vec4(1.0) - (vec4(0.007, 0.003, 0.001, 0.0) * length(w.xy) + vec4(0.1)) * m * 0.005;
 }
 
 

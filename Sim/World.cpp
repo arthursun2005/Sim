@@ -8,18 +8,19 @@
 
 #include "World.hpp"
 
-void World::solve(float dt, float its) {
+void World::solve(float its) {
     if(its < 1.0f) return;
     solver_record += its;
     solver_record = solver_record - floorf(solver_record);
     int i = floorf(its + solver_record);
-    float _dt = dt/(float)i;
+    dt /= (float)i;
     for(int n = 0; n < i; ++n) {
-        solve_once(_dt);
+        solve_once();
     }
+    dt *= (float)i;
 }
 
-void World::solve_once(float dt) {
+void World::solve_once() {
     // transfering particle velocities to MAC grid
     toGrid();
     
@@ -27,7 +28,7 @@ void World::solve_once(float dt) {
     
     copyToTemp();
     
-    apply_forces_bound(dt);
+    apply_forces_bound();
     
     // weighting each cell, 0 means air, >0 means liquid
     weight();
@@ -44,7 +45,7 @@ void World::solve_once(float dt) {
     
     transfer();
     
-    advect_particles(dt);
+    advect_particles();
 }
 
 void World::toGrid() {
@@ -58,10 +59,26 @@ void World::toGrid() {
     sd[e_partToGrid]->uniform1i("V", dtex[e_velocities]->i(1).id);
     sd[e_partToGrid]->uniform2f("size", simSize);
     
+    sd[e_partToGrid]->uniform1i("x", 1);
+    sd[e_partToGrid]->uniform1i("y", 0);
+    
     dtex[e_grid]->i(1).bind();
     
     glEnable(GL_BLEND);
-    blit(e_grid, 1, VAO[1], 0, count * 2, gridSize);
+    blit(e_grid, 1, VAO[0], 0, count, gridSize);
+    
+    reset_texture_count;
+    
+    dtex[e_positions]->i(1).bind();
+    dtex[e_velocities]->i(1).bind();
+    dtex[e_grid]->i(1).bind();
+    
+    sd[e_partToGrid]->uniform1i("P", dtex[e_positions]->i(1).id);
+    sd[e_partToGrid]->uniform1i("V", dtex[e_velocities]->i(1).id);
+    sd[e_partToGrid]->uniform1i("x", 0);
+    sd[e_partToGrid]->uniform1i("y", 1);
+    
+    blit(e_grid, 1, VAO[0], 0, count, gridSize);
     glDisable(GL_BLEND);
     
     reset_texture_count;
@@ -108,6 +125,7 @@ void World::weight() {
     sd[e_weight]->uniform1f("size", 1.0f);
     
     dtex[e_weights]->i(1).bind();
+    
     glEnable(GL_BLEND);
     blit(e_weights, 1, VAO[0], 0, count, simSize);
     glDisable(GL_BLEND);
@@ -202,7 +220,7 @@ void World::enforceBoundary() {
     dtex[e_grid]->swap();
 }
 
-void World::apply_forces_bound(float dt) {
+void World::apply_forces_bound() {
     dtex[e_grid]->i(1).bind();
     
     sd[e_gridForce]->bind();
@@ -219,7 +237,7 @@ void World::apply_forces_bound(float dt) {
     reset_texture_count;
 }
 
-void World::advect_particles(float dt) {
+void World::advect_particles() {
     dtex[e_grid]->i(1).bind();
     dtex[e_positions]->i(1).bind();
     dtex[e_velocities]->i(1).bind();
@@ -231,6 +249,7 @@ void World::advect_particles(float dt) {
     sd[e_step]->uniform1i("V", dtex[e_velocities]->i(1).id);
     sd[e_step]->uniform1i("P", dtex[e_positions]->i(1).id);
     sd[e_step]->uniform1i("G", dtex[e_grid]->i(1).id);
+    sd[e_step]->uniform1i("W", dtex[e_weights]->i(1).id);
     sd[e_step]->uniform1f("seed", glfwGetTime());
     
     dtex[e_positions]->i(0).bind();
@@ -247,9 +266,14 @@ void World::advect_particles(float dt) {
 
 
 
-void World::addRect(float x, float y, int w, int h, float s) {
-    w /= s;h /= s;
-    int i = w * h;
+int World::addRect(float x, float y, float fw, float fh, float s) {
+    fw /= s;
+    fh /= s;
+    
+    int w = roundf(fw);
+    int h = roundf(fh);
+    
+    int i = (w * h);
     
     assert(count + i <= capacity);
     
@@ -267,9 +291,25 @@ void World::addRect(float x, float y, int w, int h, float s) {
     count += i;
     
     reset_texture_count;
+    
+    
+    
+    return i;
 }
 
-void World::addCircle(float x, float y, float r, float s) {
+void World::addRect(float x, float y, float fw, float fh, float s, float vx, float vy) {
+    int i = addRect(x, y, fw, fh, s);
+    
+    sd[e_set]->bind();
+    sd[e_set]->uniform4f("a", vx, vy, 0.0f, 0.0f);
+    
+    dtex[e_velocities]->i(1).bind();
+    blit(e_velocities, 1, VAO[0], count - i, i, roots);
+    
+    reset_texture_count;
+}
+
+int World::addCircle(float x, float y, float r, float s) {
     int i = (int)(M_PI * r * r / (s * s));
     
     assert(count + i <= capacity);
@@ -282,6 +322,20 @@ void World::addCircle(float x, float y, float r, float s) {
     blit(e_positions, 1, VAO[0], count, i, roots);
     
     count += i;
+    
+    reset_texture_count;
+    
+    return i;
+}
+
+void World::addCircle(float x, float y, float r, float s, float vx, float vy) {
+    int i = addCircle(x, y, r, s);
+    
+    sd[e_set]->bind();
+    sd[e_set]->uniform4f("a", vx, vy, 0.0f, 0.0f);
+    
+    dtex[e_velocities]->i(1).bind();
+    blit(e_velocities, 1, VAO[0], count - i, i, roots);
     
     reset_texture_count;
 }
@@ -300,25 +354,9 @@ void World::copyToTemp() {
 
 
 void World::render(GLuint _target, int x, int y, int w, int h) {
-    bool gg = false;
+    int k = 0b1;
     
-    if(!gg) {
-        dtex[e_positions]->i(1).bind();
-        
-        sd[e_draw]->bind();
-        sd[e_draw]->uniform1i("T", dtex[e_positions]->i(1).id);
-        sd[e_draw]->uniform2f("scl", 1.0f/simSize);
-        sd[e_draw]->uniform1f("size", 2.0f);
-        
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _target);
-        glBindVertexArray(VAO[0]);
-        glViewport(x, y, w, h);
-        glDrawArrays(GL_POINTS, 0, count);
-        glBindVertexArray(0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                
-        reset_texture_count;
-    }else{
+    if(k & 0b10) {
         dtex[e_weights]->i(1).bind();
         dtex[e_grid]->i(1).bind();
     
@@ -331,6 +369,27 @@ void World::render(GLuint _target, int x, int y, int w, int h) {
         
         ::blit(_target, x, y, w, h);
     
+        reset_texture_count;
+    }
+    
+    if(k & 0b1) {
+        dtex[e_positions]->i(1).bind();
+        dtex[e_velocities]->i(1).bind();
+        
+        sd[e_draw]->bind();
+        sd[e_draw]->uniform1i("T", dtex[e_positions]->i(1).id);
+        sd[e_draw]->uniform1i("V", dtex[e_velocities]->i(1).id);
+        sd[e_draw]->uniform2f("scl", 1.0f/simSize);
+        sd[e_draw]->uniform1f("dt", dt);
+        sd[e_draw]->uniform1f("size", 2.0f);
+        
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _target);
+        glBindVertexArray(VAO[0]);
+        glViewport(x, y, w, h);
+        glDrawArrays(GL_POINTS, 0, count);
+        glBindVertexArray(0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
         reset_texture_count;
     }
       

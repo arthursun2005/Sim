@@ -6,7 +6,7 @@ uniform vec2 invSize;
 void main() {
     vec2 coord = gl_FragCoord.xy * invSize;
     vec4 vel = texture(V, coord);
-    vel.xy /= vel.zw + (1.0 - sign(vel.zw));
+    vel.xy /= vel.zw + (1.0f - sign(vel.zw));
     A = vel;
 }
 

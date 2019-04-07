@@ -3,7 +3,7 @@ layout (location = 0) out vec4 A;
 uniform sampler2D V;
 uniform vec2 invSize;
 
-const float R = 4.0;
+const float R = 7.0;
 
 void main() {
     vec2 coord = gl_FragCoord.xy * invSize;
@@ -15,13 +15,14 @@ void main() {
     for(float x = -R; x <= R; x += 1.0) {
         for(float y = -R; y <= R; y += 1.0) {
             vec4 v = texture(V, coord + vec2(x, y) * invSize);
-            sum += w * v.xy * v.zw;
-            weight += w * v.zw;
-            ww += w * v.zw * v.zw;
+            float distSq = (x * x + y * y);
+            distSq = distSq + (1.0 - sign(distSq));
+            sum += w * v.xy * v.zw / distSq;
+            weight += w * v.zw / distSq;
+            ww += w * v.zw * v.zw / distSq;
         }
     }
     weight = weight + (1.0 - sign(weight));
-    //A = ct + vec4(sum / weight, ww / weight);
-    A = ct + vec4(sum / weight, 0.0, 0.0);
+    A = ct + vec4(sum / weight, ww / weight);
 }
 
