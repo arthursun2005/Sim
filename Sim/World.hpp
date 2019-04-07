@@ -63,7 +63,7 @@ protected:
     glm::vec2 simSize;
     glm::vec2 gridSize;
     
-    int pressure_iterations = 80;
+    int pressure_iterations = 50;
     
     int root;
     glm::vec2 roots;
