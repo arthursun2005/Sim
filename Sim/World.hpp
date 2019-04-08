@@ -67,9 +67,7 @@ protected:
     
     int root;
     glm::vec2 roots;
-    
-    float solver_record = 0.0f;
-    
+        
 public:
     
     int count;
@@ -210,7 +208,7 @@ public:
     }
     
     
-    void solve(float its);
+    void solve(int its);
     
     
     

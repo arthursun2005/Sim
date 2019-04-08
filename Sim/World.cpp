@@ -8,16 +8,13 @@
 
 #include "World.hpp"
 
-void World::solve(float its) {
-    if(its < 1.0f) return;
-    solver_record += its;
-    solver_record = solver_record - floorf(solver_record);
-    int i = floorf(its + solver_record);
-    dt /= (float)i;
-    for(int n = 0; n < i; ++n) {
+void World::solve(int its) {
+    float _dt = dt;
+    dt /= (float)its;
+    for(int n = 0; n < its; ++n) {
         solve_once();
     }
-    dt *= (float)i;
+    dt = _dt;
 }
 
 void World::solve_once() {

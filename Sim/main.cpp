@@ -13,10 +13,11 @@ const GLFWvidmode* mode;
 
 double mouseX = 0.0f, mouseY = 0.0f;
 double pmouseX = mouseX, pmouseY = mouseY;
-float width, height;
+int width = 1024;
+int height = 512;
 float dt = 0.016f;
 float windowScl = 0.75f;
-float u = 0.2f;
+float u = 0.125f;
 
 int framesPerSecond = 0;
 float lastSecondTime = glfwGetTime();
@@ -25,11 +26,12 @@ World* world;
 
 void addFromMouse() {
     float k = 2.0f * u;
-    float w = 60.0f;
-    float h = 60.0f;
-    world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, w, h, 1.0f, 0.0f, -1000.0f);
+    float w = 10.0f;
+    float h = 10.0f;
+    world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, 20.0f, 20.0f, 1.0f);
+    //world->addRect((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, w, h, 1.0f, 0.0f, -2000.0f);
     //world->addCircle((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, 0.05f, 0.0002f, -100000.0f, -30000.0f);
-    //world->addCircle((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, 20.0f, 0.5f);
+    //world->addCircle((mouseX * 2.0f - width) * k, (mouseY * 2.0f - height) * -k, 10.0f, 0.5f, 0.0f, -2000.0f);
 }
 
 void mouseCallback(GLFWwindow* window, int button, int action, int mods)
@@ -64,7 +66,7 @@ void initialize() {
     printf("sim width: %d\n", w);
     printf("sim height: %d\n", h);
     
-    world = new World(w, h, 2048);
+    world = new World(w, h, 1024);
     
     world->exf.x = 0.0f;
     world->exf.y = -600.0f;
@@ -77,7 +79,7 @@ void free() {
 }
 
 void draw() {
-    world->solve(4.0f);
+    world->solve(4);
     world->render(0, 0, 0, width * 2, height * 2);
 }
 
@@ -98,9 +100,6 @@ int main(int argc, const char * argv[]) {
     
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     mode = glfwGetVideoMode(monitor);
-    
-    width = (float)mode->width * windowScl;
-    height = (float)mode->height * windowScl;
     
     window = glfwCreateWindow(width, height, "Sim", NULL, NULL);
     
@@ -129,8 +128,8 @@ int main(int argc, const char * argv[]) {
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     
-    float w = 400.0f;
-    float h = 400.0f;
+    float w = 220.0f;
+    float h = 220.0f;
     
     float s = 1.0f;
     
@@ -138,14 +137,14 @@ int main(int argc, const char * argv[]) {
     
     world->dt = dt;
     
-    world->addRect(-220.0f, 100.0f, 400.0f, 400.0f, s);
-    //world->addRect(0.0f, (sh * 2.0f - height) * u * 2.0f, width * u * 4.0f, sh, 1.0f);
+    //world->addRect(-width * u * 2.0f + w * 0.5f, height * u * 2.0f - h * 0.5f, w, h, s);
+    world->addRect(0.0f, sh * 0.5f - height * u * 2.0f, width * u * 4.0f, sh, 1.0f);
     //world->addRect((w * 3.0f - width) * u * 2.0f, (h * 3.0f - height) * u * -2.0f, w, h, s);
     //world->addRect((width - w * 3.0f) * u * 2.0f, (h * 3.0f - height) * u * -2.0f, w, h, s);
     //world->addCircle(0.0f, 0.0f, 120.0f, 0.75f);
     
     do {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
         glfwGetCursorPos(window, &mouseX, &mouseY);
